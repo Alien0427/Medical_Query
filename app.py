@@ -3,9 +3,9 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from triage_backend import analyze_symptoms
 
-app = FastAPI(title="Triage AI API")
+app = FastAPI(title="Medical Triage API")
 
-# Allow CORS so your frontend index.html can call this API
+# Allow CORS so the frontend can call this API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,7 +23,7 @@ def triage_endpoint(request: SymptomRequest):
     if not request.symptoms or not request.symptoms.strip():
         raise HTTPException(status_code=400, detail="Symptoms text cannot be empty.")
     
-    # Call the logic defined in your triage_backend.py
+    # Call the core triage logic
     result = analyze_symptoms(request.symptoms)
     
     if result is None:

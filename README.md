@@ -1,10 +1,10 @@
-# 🏥 Trustworthy Medical Triage AI
+# Trustworthy Medical Triage AI
 
-A full-stack AI-powered medical triage tool that analyzes user-described symptoms and returns a structured JSON assessment — with a built-in deterministic safety guardrail that bypasses the LLM entirely for life-threatening emergencies.
+A full-stack medical triage tool that analyzes user-described symptoms and returns a structured JSON assessment, with a built-in deterministic safety guardrail that bypasses the LLM entirely for life-threatening emergencies.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 medical_query/
@@ -19,7 +19,7 @@ medical_query/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repository
 ```bash
@@ -51,11 +51,11 @@ $env:GEMINI_API_KEY="your-gemini-api-key-here"
 # Mac/Linux
 export GEMINI_API_KEY="your-gemini-api-key-here"
 ```
-> ⚠️ **Never hardcode your API key in source files.** Always use environment variables.
+> **Never hardcode your API key in source files.** Always use environment variables.
 
 ---
 
-## ▶️ Running the Application
+## Running the Application
 
 ### Start the Backend API Server
 ```bash
@@ -72,7 +72,7 @@ Then open your browser and navigate to `http://localhost:3000`.
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
 With the server running, open another terminal and execute:
 ```bash
@@ -84,30 +84,30 @@ This runs three scenarios:
 |----------|-------|----------|
 | **A - Benign** | Mild headache for a few hours | `Low` urgency via LLM |
 | **B - Complex** | Fever, chills, persistent cough for 4 days | `Medium/High` urgency via LLM |
-| **C - Critical** | Severe chest pain and shortness of breath | `CRITICAL` — **LLM bypassed** by regex guardrail |
+| **C - Critical** | Severe chest pain and shortness of breath | `CRITICAL` — LLM bypassed by regex guardrail |
 
 ---
 
-## 🛡️ Safety Architecture
+## Safety Architecture
 
 ```
 User Input
-    │
-    ▼
-┌─────────────────────────────┐
-│  Deterministic Safety Layer │  ← Regex pattern matching (no LLM call)
-│  (check_high_risk_symptoms) │    Returns CRITICAL instantly if triggered
-└────────────┬────────────────┘
-             │ (safe input only)
-             ▼
-┌─────────────────────────────┐
-│      Gemini 2.5 Flash       │  ← Strict system prompt, JSON output mode
-│  (analyze_symptoms via LLM) │
-└─────────────────────────────┘
+    |
+    v
++-----------------------------+
+|  Deterministic Safety Layer |  <- Regex pattern matching (no LLM call)
+|  (check_high_risk_symptoms) |     Returns CRITICAL instantly if triggered
++-------------+---------------+
+              | (safe input only)
+              v
++-----------------------------+
+|      Gemini 2.5 Flash       |  <- Strict system prompt, JSON output mode
+|  (analyze_symptoms via LLM) |
++-----------------------------+
 ```
 
 ---
 
-## ⚕️ Disclaimer
+## Disclaimer
 
 This tool is for **educational and demonstration purposes only**. It is **not a substitute for professional medical advice, diagnosis, or treatment**. Always consult a qualified healthcare provider.

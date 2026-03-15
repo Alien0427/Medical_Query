@@ -1,14 +1,14 @@
 import os
 import json
 import re
+from typing import Optional
 from google import genai
 from google.genai import types
 
-# Initialize the Google GenAI client. 
-# Make sure to set the GEMINI_API_KEY environment variable before running.
-# Example: export GEMINI_API_KEY="your-api-key-here" (Linux/Mac)
-# Example: set GEMINI_API_KEY="your-api-key-here" (Windows CMD)
-# Example: $env:GEMINI_API_KEY="your-api-key-here" (Windows PowerShell)
+# Initialize the Google GenAI client.
+# Set the GEMINI_API_KEY environment variable before running.
+# Windows PowerShell: $env:GEMINI_API_KEY="your-api-key-here"
+# Mac/Linux:          export GEMINI_API_KEY="your-api-key-here"
 client = genai.Client()
 
 def check_high_risk_symptoms(symptom_text: str):
@@ -41,7 +41,7 @@ def check_high_risk_symptoms(symptom_text: str):
     
     return None
 
-def analyze_symptoms(symptom_text: str) -> dict:
+def analyze_symptoms(symptom_text: str) -> Optional[dict]:
     """
     Sends symptom text to the Gemini LLM and parses the JSON triage response.
     """
@@ -65,7 +65,7 @@ You must output absolutely nothing besides the raw JSON object. The JSON should 
 }"""
 
     try:
-        # Using gemini-2.5-flash for fast and reliable JSON generation.
+        # Using gemini-2.5-flash for structured JSON generation.
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=f"Here are my symptoms: {symptom_text}",
@@ -93,7 +93,7 @@ You must output absolutely nothing besides the raw JSON object. The JSON should 
         return None
 
 if __name__ == "__main__":
-    # Test cases to prove the prompt properly handles both minor and critical situations
+    # Sample test cases covering both minor and critical symptom inputs
     test_cases = [
         "I have a mild headache and a runny nose that lasted for 2 days now.",
         "Suddenly my chest feels incredibly tight, I'm sweating profusely, and my left arm is completely numb.",
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         print(f"\n" + "="*50)
         print(f"Test case {i}: {user_input}")
         
-        # NOTE: This will fail if GEMINI_API_KEY is not set. 
+        # Requires GEMINI_API_KEY to be set in the environment.
         result = analyze_symptoms(user_input)
         
         if result:
