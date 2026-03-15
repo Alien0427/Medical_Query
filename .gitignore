@@ -17,3 +17,5 @@ Thumbs.db
 # IDE/Editor directories
 .vscode/
 .idea/
+
+.vercel
