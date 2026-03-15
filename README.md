@@ -1,5 +1,7 @@
 # Trustworthy Medical Triage AI
 
+**Live Demo:** [https://medicalquery.vercel.app](https://medicalquery.vercel.app)
+
 A full-stack medical triage tool that analyzes user-described symptoms and returns a structured JSON assessment, with a built-in deterministic safety guardrail that bypasses the LLM entirely for life-threatening emergencies.
 
 ---
