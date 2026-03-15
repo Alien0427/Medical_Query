@@ -114,7 +114,10 @@
 
             try {
                 // Call the FastAPI Backend
-                const response = await fetch('http://127.0.0.1:8000/api/triage', {
+                const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+                    ? 'http://127.0.0.1:8000/api/triage'  // local dev
+                    : '/api/triage';                        // Vercel production
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
