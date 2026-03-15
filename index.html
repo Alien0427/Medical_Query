@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trustworthy Medical Triage AI</title>
+    <!-- Importing a clean, modern font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            TriageAI
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#" class="active">Triage Tool</a></li>
+            <li><a href="#">About Trustworthy AI</a></li>
+        </ul>
+    </nav>
+    <main class="container">
+        <div class="card">
+            <h1>Symptom Assessment</h1>
+            <p>Please describe your symptoms in detail. Our AI will securely analyze them to provide guided triage.</p>
+            <form id="triage-form" action="#" method="POST">
+                <div class="form-group">
+                    <label for="symptoms">How are you feeling?</label>
+                    <textarea id="symptoms" name="symptoms" rows="5" placeholder="e.g., I have a headache, a mild fever, and a sore throat..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration of Symptoms</label>
+                    <div class="select-wrapper">
+                        <select id="duration" name="duration" required>
+                            <option value="" disabled selected>Select duration</option>
+                            <option value="<24h">&lt; 24 hours</option>
+                            <option value="1-3d">1-3 days</option>
+                            <option value="1w+">1 week+</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" id="submit-btn" class="btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px; display: inline-block;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Analyze Symptoms
+                </button>
+            </form>
+        </div>
+
+        <!-- Dynamic Output Layout -->
+        <div class="card results-card" id="results-card" style="display: none;">
+            <h2>Triage Assessment Output</h2>
+            
+            <div class="results-table-wrapper">
+                <table class="results-table">
+                    <tbody>
+                        <tr>
+                            <th>Urgency Level</th>
+                            <td id="output-urgency"><span class="urgency-badge critical">CRITICAL</span></td>
+                        </tr>
+                        <tr>
+                            <th>Symptom Duration</th>
+                            <td id="output-duration">&lt; 24 hours</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="categories-section">
+                <h3>Possible Categories</h3>
+                <ul class="categories-list" id="output-categories">
+                    <!-- Categories will be injected here -->
+                </ul>
+            </div>
+
+            <div class="disclaimer-alert">
+                <div class="alert-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="alert-content">
+                    <p id="output-disclaimer"><strong>Disclaimer:</strong> ...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('triage-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const submitBtn = document.getElementById('submit-btn');
+            const resultsCard = document.getElementById('results-card');
+            
+            const symptoms = document.getElementById('symptoms').value;
+            const durationElement = document.getElementById('duration');
+            const durationText = durationElement.options[durationElement.selectedIndex].text;
+            
+            // Set Loading State
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Analyzing...';
+            resultsCard.style.display = 'none';
+
+            try {
+                // Call the FastAPI Backend
+                const response = await fetch('http://127.0.0.1:8000/api/triage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        symptoms: symptoms,
+                        duration: durationText
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API Request Failed');
+                }
+
+                const data = await response.json();
+
+                // Build Urgency Badge
+                const urgencyLevel = data.urgency_level.toUpperCase();
+                let badgeClass = 'low'; // default
+                if (urgencyLevel.includes('MEDIUM')) badgeClass = 'medium';
+                if (urgencyLevel.includes('HIGH')) badgeClass = 'high';
+                if (urgencyLevel.includes('CRITICAL')) badgeClass = 'critical';
+
+                document.getElementById('output-urgency').innerHTML = `<span class="urgency-badge ${badgeClass}">${urgencyLevel}</span>`;
+                document.getElementById('output-duration').textContent = durationText;
+
+                // Build Categories List
+                const categoriesList = document.getElementById('output-categories');
+                categoriesList.innerHTML = ''; // prevent duplicates
+                data.possible_categories.forEach(category => {
+                    const li = document.createElement('li');
+                    li.textContent = category;
+                    categoriesList.appendChild(li);
+                });
+
+                // Build Disclaimer
+                document.getElementById('output-disclaimer').innerHTML = `<strong>Disclaimer:</strong> ${data.disclaimer}`;
+
+                // Show Results Card
+                resultsCard.style.display = 'block';
+
+            } catch (error) {
+                alert('Connection to Triage API failed. Ensure the FastAPI backend is running on port 8000.');
+                console.error('Error:', error);
+            } finally {
+                // Restore Button State
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px; display: inline-block;">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    Analyze Symptoms
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Python virtual environment
+venv/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variable files (NEVER commit API keys)
+.env
+*.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor directories
+.vscode/
+.idea/
